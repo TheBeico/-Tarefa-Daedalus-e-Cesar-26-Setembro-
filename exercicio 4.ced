@@ -1,0 +1,125 @@
+.org 0x0000
+
+DISPLAY .equ 0x20
+TECLADO .equ 0x10
+
+inicio:
+    LDI R0, 0xFF
+    MOV SP, R0
+    
+    LDI R1, mensagem_nome
+    CALL imprimir_string
+    CALL delay
+    
+    LDI R1, mensagem_ra
+    CALL imprimir_string
+    CALL delay
+    
+    LDI R1, mensagem_prompt
+    CALL imprimir_string
+
+aguarda_tecla:
+    IN R2, TECLADO
+    MOV R0, R2
+    BZ aguarda_tecla
+    
+    LDI R0, 'S'
+    SUB R0, R2
+    BZ tecla_s
+    
+    LDI R0, 's'
+    SUB R0, R2
+    BZ tecla_s
+    
+    LDI R0, 'N'
+    SUB R0, R2
+    BZ tecla_n
+    
+    LDI R0, 'n'
+    SUB R0, R2
+    BZ tecla_n
+    
+    JMP aguarda_tecla
+
+tecla_s:
+    LDI R1, mensagem_sim
+    CALL imprimir_string
+    JMP fim
+
+tecla_n:
+    LDI R1, mensagem_nao
+    CALL imprimir_string
+    JMP fim
+
+imprimir_string:
+    PUSH R0
+    PUSH R2
+    MOV R0, R1
+
+loop_imprime:
+    LD R2, R0
+    MOV R3, R2
+    BZ fim_imprime
+    OUT R2, DISPLAY
+    PUSH R3
+    LDI R3, 50
+    CALL delay_pequeno
+    POP R3
+    INC R0
+    JMP loop_imprime
+
+fim_imprime:
+    POP R2
+    POP R0
+    RET
+
+delay:
+    PUSH R3
+    PUSH R4
+    LDI R3, 5
+    LDI R4, 0xFF
+
+delay_loop1:
+    LDI R5, 0xFF
+delay_loop2:
+    DEC R5
+    BNZ delay_loop2
+    DEC R4
+    BNZ delay_loop1
+    DEC R3
+    BNZ delay_loop1
+    POP R4
+    POP R3
+    RET
+
+delay_pequeno:
+    PUSH R4
+delay_pequeno_loop:
+    LDI R4, 10
+delay_pequeno_interno:
+    DEC R4
+    BNZ delay_pequeno_interno
+    DEC R3
+    BNZ delay_pequeno_loop
+    POP R4
+    RET
+
+fim:
+    JMP fim
+
+mensagem_nome:
+    .db 'L','u','c','a','s',0x0D,0x0A,0
+
+mensagem_ra:
+    .db 'R','A',':',' ','H','T','3','0','5','2','0','7','9',0x0D,0x0A,0
+
+mensagem_prompt:
+    .db '>',' ','C','o','n','t','i','n','u','a','r',' ','(','S','/','N',')','?',' ',0
+
+mensagem_sim:
+    .db 'S','i','m',' ','c','o','n','f','i','r','m','a','d','o','!',0x0D,0x0A,0
+
+mensagem_nao:
+    .db 'N','a','o',' ','c','a','n','c','e','l','a','d','o','!',0x0D,0x0A,0
+
+.end
