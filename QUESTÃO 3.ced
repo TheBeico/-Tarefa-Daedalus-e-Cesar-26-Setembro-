@@ -1,0 +1,33 @@
+
+; Exercício 3 – Manipulação de Bits no CESAR
+
+        ORG 0
+        ; --- Carrega valores imediatos ---
+        MOV R0, #25      ; valor de teste
+        MOV R1, #4       ; máscara (bit 2)
+
+; --- Isolar bit ---
+        MOV R2, R0
+        AND R2, R1       ; R2 = valor isolado
+
+; --- Set bit ---
+        MOV R3, R0
+        OR  R3, R1       ; R3 = valor com bit ligado
+
+; --- Clear bit ---
+        NOT R1
+        MOV R4, R0
+        AND R4, R1       ; R4 = valor com bit zerado
+        NOT R1           ; restaura máscara original
+
+; --- Contar bits ligados ---
+        CLR R5           ; contador = 0
+        MOV R6, R0       ; copia valor para teste
+
+LOOP:   ROR R6           ; desloca 1 bit à direita
+        BCC PROX         ; se carry=0, não soma
+        INC R5           ; se carry=1, soma contador
+PROX:   CMP R6, #0
+        BNE LOOP
+
+        HLT
